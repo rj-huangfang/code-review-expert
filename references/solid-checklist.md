@@ -1,65 +1,65 @@
-# SOLID Smell Prompts
+# SOLID 异味提示
 
-## SRP (Single Responsibility)
+## SRP（单一职责）
 
-- File owns unrelated concerns (e.g., HTTP + DB + domain rules in one file)
-- Large class/module with low cohesion or multiple reasons to change
-- Functions that orchestrate many unrelated steps
-- God objects that know too much about the system
-- **Ask**: "What is the single reason this module would change?"
+- 文件拥有不相关的关注点（例如，HTTP + 数据库 + 领域规则在一个文件中）
+- 大型类/模块内聚性低或有多个更改原因
+- 编排许多不相关步骤的函数
+- 对系统了解太多的上帝对象
+- **问**："这个模块会因为什么单一原因而改变？"
 
-## OCP (Open/Closed)
+## OCP（开闭原则）
 
-- Adding a new behavior requires editing many switch/if blocks
-- Feature growth requires modifying core logic rather than extending
-- No plugin/strategy/hook points for variation
-- **Ask**: "Can I add a new variant without touching existing code?"
+- 添加新行为需要编辑许多 switch/if 块
+- 功能增长需要修改核心逻辑而不是扩展
+- 没有用于变化的插件/策略/钩子点
+- **问**："我能在不触碰现有代码的情况下添加新变体吗？"
 
-## LSP (Liskov Substitution)
+## LSP（里氏替换）
 
-- Subclass checks for concrete type or throws for base method
-- Overridden methods weaken preconditions or strengthen postconditions
-- Subclass ignores or no-ops parent behavior
-- **Ask**: "Can I substitute any subclass without the caller knowing?"
+- 子类检查具体类型或为基方法抛出异常
+- 重写的方法削弱前置条件或加强后置条件
+- 子类忽略或空操作父类行为
+- **问**："我可以在调用者不知情的情况下替换任何子类吗？"
 
-## ISP (Interface Segregation)
+## ISP（接口隔离）
 
-- Interfaces with many methods, most unused by implementers
-- Callers depend on broad interfaces for narrow needs
-- Empty/stub implementations of interface methods
-- **Ask**: "Do all implementers use all methods?"
+- 具有许多方法的接口，实现者大多未使用
+- 调用者依赖于狭窄需求的宽接口
+- 接口方法的空/存根实现
+- **问**："所有实现者都使用所有方法吗？"
 
-## DIP (Dependency Inversion)
+## DIP（依赖倒置）
 
-- High-level logic depends on concrete IO, storage, or network types
-- Hard-coded implementations instead of abstractions or injection
-- Import chains that couple business logic to infrastructure
-- **Ask**: "Can I swap the implementation without changing business logic?"
+- 高级逻辑依赖于具体的 IO、存储或网络类型
+- 硬编码实现而不是抽象或注入
+- 将业务逻辑耦合到基础设施的导入链
+- **问**："我可以在不更改业务逻辑的情况下交换实现吗？"
 
 ---
 
-## Common Code Smells (Beyond SOLID)
+## 常见代码异味（超越 SOLID）
 
-| Smell | Signs |
+| 异味 | 迹象 |
 |-------|-------|
-| **Long method** | Function > 30 lines, multiple levels of nesting |
-| **Feature envy** | Method uses more data from another class than its own |
-| **Data clumps** | Same group of parameters passed together repeatedly |
-| **Primitive obsession** | Using strings/numbers instead of domain types |
-| **Shotgun surgery** | One change requires edits across many files |
-| **Divergent change** | One file changes for many unrelated reasons |
-| **Dead code** | Unreachable or never-called code |
-| **Speculative generality** | Abstractions for hypothetical future needs |
-| **Magic numbers/strings** | Hardcoded values without named constants |
+| **长方法** | 函数 > 30 行，多层嵌套 |
+| **特征依恋** | 方法使用来自另一个类的数据多于自己的 |
+| **数据泥团** | 相同的参数组重复一起传递 |
+| **基本类型偏执** | 使用字符串/数字而不是领域类型 |
+| **散弹手术** | 一个更改需要跨许多文件编辑 |
+| **发散式变化** | 一个文件因许多不相关的原因而更改 |
+| **死代码** | 无法到达或从未调用的代码 |
+| **投机性通用** | 为假设的未来需求准备的抽象 |
+| **魔术数字/字符串** | 没有命名常量的硬编码值 |
 
 ---
 
-## Refactor Heuristics
+## 重构启发式
 
-1. **Split by responsibility, not by size** - A small file can still violate SRP
-2. **Introduce abstraction only when needed** - Wait for the second use case
-3. **Keep refactors incremental** - Isolate behavior before moving
-4. **Preserve behavior first** - Add tests before restructuring
-5. **Name things by intent** - If naming is hard, the abstraction might be wrong
-6. **Prefer composition over inheritance** - Inheritance creates tight coupling
-7. **Make illegal states unrepresentable** - Use types to enforce invariants
+1. **按职责拆分，而不是按大小** - 小文件仍可能违反 SRP
+2. **仅在需要时引入抽象** - 等待第二个用例
+3. **保持重构增量** - 在移动之前隔离行为
+4. **首先保持行为** - 在重构前添加测试
+5. **按意图命名** - 如果命名困难，抽象可能是错误的
+6. **优先组合而不是继承** - 继承创建紧密耦合
+7. **使非法状态不可表示** - 使用类型强制不变量

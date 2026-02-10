@@ -1,130 +1,130 @@
-# Code Quality Checklist
+# 代码质量检查清单
 
-## Error Handling
+## 错误处理
 
-### Anti-patterns to Flag
+### 要标记的反模式
 
-- **Swallowed exceptions**: Empty catch blocks or catch with only logging
+- **吞咽异常**：空的 catch 块或仅记录日志的 catch
   ```javascript
-  try { ... } catch (e) { }  // Silent failure
-  try { ... } catch (e) { console.log(e) }  // Log and forget
+  try { ... } catch (e) { }  // 静默失败
+  try { ... } catch (e) { console.log(e) }  // 记录后忘记
   ```
-- **Overly broad catch**: Catching `Exception`/`Error` base class instead of specific types
-- **Error information leakage**: Stack traces or internal details exposed to users
-- **Missing error handling**: No try-catch around fallible operations (I/O, network, parsing)
-- **Async error handling**: Unhandled promise rejections, missing `.catch()`, no error boundary
+- **过于宽泛的捕获**：捕获 `Exception`/`Error` 基类而不是特定类型
+- **错误信息泄露**：将堆栈跟踪或内部详情暴露给用户
+- **缺失错误处理**：易失败的操作（I/O、网络、解析）周围没有 try-catch
+- **异步错误处理**：未处理的 promise 拒绝、缺失 `.catch()`、没有错误边界
 
-### Best Practices to Check
+### 要检查的最佳实践
 
-- [ ] Errors are caught at appropriate boundaries
-- [ ] Error messages are user-friendly (no internal details exposed)
-- [ ] Errors are logged with sufficient context for debugging
-- [ ] Async errors are properly propagated or handled
-- [ ] Fallback behavior is defined for recoverable errors
-- [ ] Critical errors trigger alerts/monitoring
+- [ ] 在适当的边界处捕获错误
+- [ ] 错误消息对用户友好（不暴露内部详情）
+- [ ] 记录错误时包含足够的上下文用于调试
+- [ ] 异步错误被正确传播或处理
+- [ ] 为可恢复的错误定义了回退行为
+- [ ] 严重错误触发警报/监控
 
-### Questions to Ask
-- "What happens when this operation fails?"
-- "Will the caller know something went wrong?"
-- "Is there enough context to debug this error?"
+### 要问的问题
+- "当此操作失败时会发生什么？"
+- "调用者会知道出了问题吗？"
+- "是否有足够的上下文来调试此错误？"
 
 ---
 
-## Performance & Caching
+## 性能与缓存
 
-### CPU-Intensive Operations
+### CPU 密集型操作
 
-- **Expensive operations in hot paths**: Regex compilation, JSON parsing, crypto in loops
-- **Blocking main thread**: Sync I/O, heavy computation without worker/async
-- **Unnecessary recomputation**: Same calculation done multiple times
-- **Missing memoization**: Pure functions called repeatedly with same inputs
+- **热路径中的昂贵操作**：在循环中进行正则表达式编译、JSON 解析、加密
+- **阻塞主线程**：同步 I/O、没有 worker/async 的重度计算
+- **不必要的重复计算**：多次进行相同的计算
+- **缺失记忆化**：纯函数使用相同输入重复调用
 
-### Database & I/O
+### 数据库与 I/O
 
-- **N+1 queries**: Loop that makes a query per item instead of batch
+- **N+1 查询**：循环中每个项目都进行查询而不是批处理
   ```javascript
-  // Bad: N+1
+  // 坏：N+1
   for (const id of ids) {
     const user = await db.query(`SELECT * FROM users WHERE id = ?`, id)
   }
-  // Good: Batch
+  // 好：批处理
   const users = await db.query(`SELECT * FROM users WHERE id IN (?)`, ids)
   ```
-- **Missing indexes**: Queries on unindexed columns
-- **Over-fetching**: SELECT * when only few columns needed
-- **No pagination**: Loading entire dataset into memory
+- **缺失索引**：在未建索引的列上查询
+- **过度获取**：只需要几列时使用 SELECT *
+- **无分页**：将整个数据集加载到内存
 
-### Caching Issues
+### 缓存问题
 
-- **Missing cache for expensive operations**: Repeated API calls, DB queries, computations
-- **Cache without TTL**: Stale data served indefinitely
-- **Cache without invalidation strategy**: Data updated but cache not cleared
-- **Cache key collisions**: Insufficient key uniqueness
-- **Caching user-specific data globally**: Security/privacy issue
+- **昂贵操作缺失缓存**：重复的 API 调用、数据库查询、计算
+- **没有 TTL 的缓存**：无限期地提供陈旧数据
+- **没有失效策略的缓存**：数据已更新但缓存未清除
+- **缓存键冲突**：键唯一性不足
+- **全局缓存用户特定数据**：安全/隐私问题
 
-### Memory
+### 内存
 
-- **Unbounded collections**: Arrays/maps that grow without limit
-- **Large object retention**: Holding references preventing GC
-- **String concatenation in loops**: Use StringBuilder/join instead
-- **Loading large files entirely**: Use streaming instead
+- **无界集合**：无限制增长的数组/映射
+- **大对象保留**：持有引用阻止 GC
+- **循环中的字符串连接**：使用 StringBuilder/join 代替
+- **完整加载大文件**：使用流式处理代替
 
-### Questions to Ask
-- "What's the time complexity of this operation?"
-- "How does this behave with 10x/100x data?"
-- "Is this result cacheable? Should it be?"
-- "Can this be batched instead of one-by-one?"
+### 要问的问题
+- "这个操作的时间复杂度是多少？"
+- "在 10 倍/100 倍数据量下这会如何表现？"
+- "这个结果可缓存吗？应该缓存吗？"
+- "这可以批处理而不是逐个处理吗？"
 
 ---
 
-## Boundary Conditions
+## 边界条件
 
-### Null/Undefined Handling
+### Null/Undefined 处理
 
-- **Missing null checks**: Accessing properties on potentially null objects
-- **Truthy/falsy confusion**: `if (value)` when `0` or `""` are valid
-- **Optional chaining overuse**: `a?.b?.c?.d` hiding structural issues
-- **Null vs undefined inconsistency**: Mixed usage without clear convention
+- **缺失空值检查**：访问可能为空的对象的属性
+- **真值/假值混淆**：当 `0` 或 `""` 是有效值时使用 `if (value)`
+- **过度使用可选链**：`a?.b?.c?.d` 隐藏结构问题
+- **Null vs undefined 不一致**：混合使用没有明确约定
 
-### Empty Collections
+### 空集合
 
-- **Empty array not handled**: Code assumes array has items
-- **Empty object edge case**: `for...in` or `Object.keys` on empty object
-- **First/last element access**: `arr[0]` or `arr[arr.length-1]` without length check
+- **未处理空数组**：代码假定数组有项目
+- **空对象边界情况**：在空对象上使用 `for...in` 或 `Object.keys`
+- **首/尾元素访问**：`arr[0]` 或 `arr[arr.length-1]` 没有长度检查
 
-### Numeric Boundaries
+### 数值边界
 
-- **Division by zero**: Missing check before division
-- **Integer overflow**: Large numbers exceeding safe integer range
-- **Floating point comparison**: Using `===` instead of epsilon comparison
-- **Negative values**: Index or count that shouldn't be negative
-- **Off-by-one errors**: Loop bounds, array slicing, pagination
+- **除以零**：除法前缺失检查
+- **整数溢出**：大数超出安全整数范围
+- **浮点比较**：使用 `===` 而不是 epsilon 比较
+- **负值**：索引或计数不应为负
+- **差一错误**：循环边界、数组切片、分页
 
-### String Boundaries
+### 字符串边界
 
-- **Empty string**: Not handled as edge case
-- **Whitespace-only string**: Passes truthy check but is effectively empty
-- **Very long strings**: No length limits causing memory/display issues
-- **Unicode edge cases**: Emoji, RTL text, combining characters
+- **空字符串**：未作为边界情况处理
+- **仅空白字符串**：通过真值检查但实际为空
+- **非常长的字符串**：没有长度限制导致内存/显示问题
+- **Unicode 边界情况**：表情符号、RTL 文本、组合字符
 
-### Common Patterns to Flag
+### 要标记的常见模式
 
 ```javascript
-// Dangerous: no null check
+// 危险：无空值检查
 const name = user.profile.name
 
-// Dangerous: array access without check
+// 危险：无检查的数组访问
 const first = items[0]
 
-// Dangerous: division without check
+// 危险：无检查的除法
 const avg = total / count
 
-// Dangerous: truthy check excludes valid values
-if (value) { ... }  // fails for 0, "", false
+// 危险：真值检查排除有效值
+if (value) { ... }  // 对 0、""、false 失败
 ```
 
-### Questions to Ask
-- "What if this is null/undefined?"
-- "What if this collection is empty?"
-- "What's the valid range for this number?"
-- "What happens at the boundaries (0, -1, MAX_INT)?"
+### 要问的问题
+- "如果这是 null/undefined 会怎样？"
+- "如果这个集合是空的会怎样？"
+- "这个数字的有效范围是什么？"
+- "在边界处（0、-1、MAX_INT）会发生什么？"
